@@ -186,13 +186,6 @@ def A_star(start, goal_state):
 
     parents = dict()
 
-    #print(fScore[str(start)])
-
-    #print(start)
-
-    #print(open)
-
-    #print(open)
 
     heapq.heappush(open_heap, (fScore[str(start)], start, (gScore[str(start)], heuristic(start), a)))
 
@@ -211,7 +204,7 @@ def A_star(start, goal_state):
         if len(open_heap) > max_len:
             max_len = len(open_heap)
 
-        print(len(open))
+        #print(len(open))
 
         f_score, current, info = heapq.heappop(open_heap)
 
@@ -221,7 +214,6 @@ def A_star(start, goal_state):
         closed.append(current)
 
         if current == goal_state:
-            print(max_len)
             return reconstruct_path(parents, current)
 
         for node in succ(current):
@@ -237,22 +229,23 @@ def A_star(start, goal_state):
                 open.append(node)
                 heapq.heappush(open_heap,(fScore[str(node)], node, (gScore[str(node)], heuristic(node), a + 1)))
 
-                if node in open or node in closed:
-                    if temp_g_score < fScore[str(node)]:
-                        parents[str(node)] = current
-                        gScore[str(node)] = temp_g_score
-                        fScore[str(node)] = temp_f_score
-                        # closed.append(node)
-                        # open.remove(node)
+            if node in open or node in closed:
+                if temp_g_score < gScore[str(node)]:
+                    print(1)
+                    # parents[str(node)] = current
+                    # gScore[str(node)] = temp_g_score
+                    # fScore[str(node)] = temp_f_score
+                    # closed.append(node)
+                    # open.remove(node)
 
-                        #heapq.heappush(open_heap,
-                                       #(fScore[str(node)], node, (gScore[str(node)], heuristic(node), a + 1)))
+                    #heapq.heappush(open_heap,
+                                   #(fScore[str(node)], node, (gScore[str(node)], heuristic(node), a + 1)))
 
-                        # open.append(node)
-                        a += 1
+                    # open.append(node)
+                    a += 1
 
-                    if temp_g_score >= fScore[str(node)]:
-                        continue
+                if temp_g_score >= gScore[str(node)]:
+                    continue
 
 
     exit("failure to find the path")
@@ -272,7 +265,7 @@ def reconstruct_path(parents, current):
 
 
 if __name__ == "__main__":
-    puzzle = [1,2,3,4,5,6,8,7,0]
+    puzzle = [1,7,3,4,6,8,5,2,0]
 
     # print(heuristic(puzzle))
     #print_succ(puzzle)
