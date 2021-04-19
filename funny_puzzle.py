@@ -3,13 +3,16 @@ import heapq
 import time
 
 
-
-
 def heuristic (puzzle):
+
+    """
+    call succ(state), and print each element with its heuristic value
+    """
+
     row = 0
     col = 0
     h = 0
-    #print(puzzle)
+
     for element in puzzle:
         # print(element)
         expect_corrd = get_expect_coord(element)
@@ -23,24 +26,31 @@ def heuristic (puzzle):
 
             continue
 
-        # print(element)
+        # calculate the manhattan distance of the element location and expected location
         h += abs(expect_corrd[0] - row) + abs(expect_corrd[1] - col)
 
         col += 1
 
+        # update the row
         if col %3 == 0 and col != 0:
             row += 1
         if col % 3 == 0 and col != 0:
             col = 0
     return h
 
-def pirnt_succ(state):
+
+def print_succ(state):
+
+    """
+    # call succ(state), and print each element with its heuristic value
+    """
 
     succ_list = succ(state)
 
     for element in succ_list:
         print(element, 'h=' + str(heuristic(element)))
 
+# return all the possible successors of the state
 def succ(state):
     row = 0
     succ_list = []
@@ -52,6 +62,8 @@ def succ(state):
                 succ1 = swap_pos(state, i, i + 3)
                 succ_list.append(succ1)
 
+                # determine to swith left of right or both for col is middle
+                # same for the latter two rows
                 succs = help_print(state, i)
                 if i % 3 == 1:
                     succ_list.append(succs[0])
@@ -87,24 +99,27 @@ def succ(state):
                     succ_list.append(succs[1])
                 else:
                     succ_list.append(succs)
+        # update row
         if i % 3 == 2:
             row += 1
 
-    sorted(succ_list)
+    # sorted(succ_list)
 
 
-    return succ_list
+    return sorted(succ_list)
 
-
+# helper function to determine the possible successors by switching horizontally
+# return the list of horizontally swtich successors if i in middle col, else return successor
 def help_print(state, i):
     succ_list = []
 
+    # col in the left
     if i % 3 == 0:
         # col 0
         succ2 = swap_pos(state, i, i + 1)
         succ_list = succ2
 
-
+    # col in the middle, return two possible successors
     if i % 3 == 1:
         # col 1
         succ2 = swap_pos(state, i, i + 1)
@@ -113,7 +128,7 @@ def help_print(state, i):
         succ_list.append(succ2)
         succ_list.append(succ3)
 
-
+    # col in the right
     if i % 3 == 2:
         # col 2
         succ2 = swap_pos(state, i, i - 1)
@@ -168,7 +183,8 @@ def solve(state):
         moves += 1
 
     pq = []
-
+# perform A star algorithm
+# return the reconstruct path
 def A_star(start, goal_state):
     open = []
     closed = []
@@ -179,9 +195,8 @@ def A_star(start, goal_state):
     current = start
     open.append(current)
 
+    # dict with parents as key and children as value
     parents = dict()
-
-    max_len = 0
 
 
     heapq.heappush(open_heap, (heuristic(start), start, (0, heuristic(start), a)))
@@ -191,22 +206,17 @@ def A_star(start, goal_state):
 
     while len(open_heap) > 0:
 
-        if len(open_heap) > max_len:
-            max_len = len(open_heap)
-
-
         f_score, current, info = heapq.heappop(open_heap)
 
         open.remove(current)
         closed.append(current)
 
         if current == goal_state:
-            print(max_len)
             return reconstruct_path(parents, current)
 
         for node in succ(current):
 
-
+            # update the g score and f score
             temp_g_score = info[0] + 1
             temp_f_score = temp_g_score + heuristic(node)
 
@@ -250,20 +260,8 @@ def reconstruct_path(parents, current):
 
 
 if __name__ == "__main__":
-    puzzle = [4,3,8,5,1,6,7,2,0]
+    puzzle = [8, 7, 6, 5, 4, 3, 2, 1, 0]
+    print_succ([1, 2, 3, 4, 5, 0, 6, 7, 8])
+    print_succ([8, 7, 6, 5, 4, 3, 2, 1, 0])
 
-    # print(heuristic(puzzle))
-    #print_succ(puzzle)
-    # print(heuristic([1, 2, 3, 4, 5, 6, 7, 0, 8]))
-    pq = []
-    heapq.heappush(pq, (5, [1, 2, 3, 4, 5, 0, 6, 7, 8], (0, 5, -1)))
-    #print(pq)
-
-    fScore = {}
-    fScore['a'] = 0
-
-    #print(fScore)
-    a = time.perf_counter()
     solve(puzzle)
-    b = time.perf_counter()
-    print(b - a)
