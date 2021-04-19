@@ -229,19 +229,21 @@ def A_star(start, goal_state):
                 open.append(node)
                 heapq.heappush(open_heap,(fScore[str(node)], node, (gScore[str(node)], heuristic(node), a + 1)))
 
-            if node in open or node in closed:
+            elif node in open or node in closed:
+
                 if temp_g_score < gScore[str(node)]:
-                    print(1)
-                    # parents[str(node)] = current
-                    # gScore[str(node)] = temp_g_score
-                    # fScore[str(node)] = temp_f_score
-                    # closed.append(node)
-                    # open.remove(node)
+                    parents[str(node)] = current
+                    gScore[str(node)] = temp_g_score
+                    fScore[str(node)] = temp_f_score
 
-                    #heapq.heappush(open_heap,
-                                   #(fScore[str(node)], node, (gScore[str(node)], heuristic(node), a + 1)))
+                    # print(1)
+                    #closed.append(node)
+                    #open.remove(node)
 
-                    # open.append(node)
+                    heapq.heappush(open_heap,
+                                   (fScore[str(node)], node, (gScore[str(node)], heuristic(node), a + 1)))
+
+                    open.append(node)
                     a += 1
 
                 if temp_g_score >= gScore[str(node)]:
@@ -265,7 +267,7 @@ def reconstruct_path(parents, current):
 
 
 if __name__ == "__main__":
-    puzzle = [1,7,3,4,6,8,5,2,0]
+    puzzle = [4,3,8,5,1,6,7,2,0]
 
     # print(heuristic(puzzle))
     #print_succ(puzzle)
