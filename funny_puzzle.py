@@ -1,5 +1,6 @@
 import copy
 import heapq
+import time
 
 
 
@@ -8,8 +9,9 @@ def heuristic (puzzle):
     row = 0
     col = 0
     h = 0
-    # print(puzzle)
+    #print(puzzle)
     for element in puzzle:
+        # print(element)
         expect_corrd = get_expect_coord(element)
 
         if(element == 0):
@@ -159,6 +161,7 @@ def solve(state):
     i = len(a) - 1
 
     while i >= 0:
+        # print(a[i])
         print(a[i], 'h='+ str(heuristic(a[i])), 'moves: ' + str(moves))
 
         i = i - 1
@@ -170,93 +173,73 @@ def A_star(start, goal_state):
     open = []
     closed = []
     open_heap = []
-    pq = []
 
     a = -1 # parent index
 
     current = start
-
     open.append(current)
 
-    gScore = dict()
-    gScore[str(start)] = 0
-
-    fScore = dict()
-    fScore[str(start)] = heuristic(start)
-
     parents = dict()
-
-
-    heapq.heappush(open_heap, (fScore[str(start)], start, (gScore[str(start)], heuristic(start), a)))
 
     max_len = 0
 
 
+    heapq.heappush(open_heap, (heuristic(start), start, (0, heuristic(start), a)))
 
+    # used for reconstruct_path1 but ends with higher time complexity
+    # static_heap.append((heuristic(start), start, (0, heuristic(start), a)))
 
-
-    while len(open) > 0:
-
-        # print(list(heapq.heappop(open_heap)))
-
-        #print(open_heap)
+    while len(open_heap) > 0:
 
         if len(open_heap) > max_len:
             max_len = len(open_heap)
 
-        #print(len(open))
 
         f_score, current, info = heapq.heappop(open_heap)
-
-
 
         open.remove(current)
         closed.append(current)
 
         if current == goal_state:
+            print(max_len)
             return reconstruct_path(parents, current)
 
         for node in succ(current):
 
 
-            temp_g_score = gScore[str(current)] + 1
+            temp_g_score = info[0] + 1
             temp_f_score = temp_g_score + heuristic(node)
 
-            if node not in open and node not in closed:
+            # parent_index = static_heap.index((f_score, current, info))
+
+            if node not in closed:
                 parents[str(node)] = current
-                gScore[str(node)] = temp_g_score
-                fScore[str(node)] = temp_f_score
+
                 open.append(node)
-                heapq.heappush(open_heap,(fScore[str(node)], node, (gScore[str(node)], heuristic(node), a + 1)))
+                heapq.heappush(open_heap,(temp_f_score, node, (temp_g_score, heuristic(node), a + 1)))
 
-            elif node in open or node in closed:
-
-                if temp_g_score < gScore[str(node)]:
-                    parents[str(node)] = current
-                    gScore[str(node)] = temp_g_score
-                    fScore[str(node)] = temp_f_score
-
-                    # print(1)
-                    #closed.append(node)
-                    #open.remove(node)
-
-                    heapq.heappush(open_heap,
-                                   (fScore[str(node)], node, (gScore[str(node)], heuristic(node), a + 1)))
-
-                    open.append(node)
-                    a += 1
-
-                if temp_g_score >= gScore[str(node)]:
-                    continue
+                # used for reconstruct_path1 but ends with higher time complexity
+                # static_heap.append((temp_f_score, node, (temp_g_score, heuristic(node), parent_index)))
 
 
-    exit("failure to find the path")
-                        #print(2)
 
+
+"""
+def reconstruct_path1(current, static_heap, info):
+    total_path = [(info[0] + info[1], current, info)]
+
+    while info[2] != -1:
+
+        current = static_heap[info[2]]
+        info = static_heap[info[2]][2]
+        total_path.append(current)
+    return total_path
+
+"""
 
 
 def reconstruct_path(parents, current):
-    # print(parents)
+
     total_path = [current]
 
     while str(current) in parents.keys():
@@ -280,5 +263,7 @@ if __name__ == "__main__":
     fScore['a'] = 0
 
     #print(fScore)
-
+    a = time.perf_counter()
     solve(puzzle)
+    b = time.perf_counter()
+    print(b - a)
